@@ -70,6 +70,22 @@ class TorrentDatabase:
         )
         return list(result.scalars().all())
 
+    def delete_by_bangumi_id(self, bangumi_id: int) -> int:
+        """Delete all torrent records associated with a bangumi.
+
+        Returns the number of deleted records.
+        """
+        statement = select(Torrent).where(Torrent.bangumi_id == bangumi_id)
+        result = self.session.execute(statement)
+        torrents = list(result.scalars().all())
+        count = len(torrents)
+        for t in torrents:
+            self.session.delete(t)
+        if count > 0:
+            self.session.commit()
+            logger.debug("Deleted %s torrent records for bangumi_id %s.", count, bangumi_id)
+        return count
+
     def search_by_url(self, url: str) -> Torrent | None:
         """Find torrent by URL."""
         result = self.session.execute(select(Torrent).where(Torrent.url == url))
