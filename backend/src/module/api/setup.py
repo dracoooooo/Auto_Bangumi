@@ -43,13 +43,6 @@ def _validate_url(url: str) -> None:
         addrs = socket.getaddrinfo(hostname, None)
     except socket.gaierror:
         raise HTTPException(status_code=400, detail="Cannot resolve hostname.")
-    for family, _, _, _, sockaddr in addrs:
-        ip = ipaddress.ip_address(sockaddr[0])
-        if ip.is_private or ip.is_reserved or ip.is_loopback:
-            raise HTTPException(
-                status_code=400,
-                detail="URLs pointing to private/reserved IPs are not allowed.",
-            )
 
 
 # --- Request/Response Models ---
